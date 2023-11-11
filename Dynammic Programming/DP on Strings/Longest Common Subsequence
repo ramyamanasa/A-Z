@@ -1,0 +1,107 @@
+Approach - 1 Memoization
+
+class Solution {
+public:
+    
+    int dp[1001][1001];
+    int solve(int i, int j, const string& text1, const string& text2){
+        
+        // Base case 
+        if (i == 0 || j == 0) {
+            return 0;
+        }
+        
+        // Memoization check if -1 and give the stored value
+        if (dp[i][j] != -1){
+            return dp[i][j]; // Overlapping subproblem answer
+        }
+        
+        // Matching case 
+        if (text1[i-1] == text2[j-1]){
+            return dp[i][j] = 1 + solve(i-1, j-1, text1, text2); // Move back one index on both strings
+        }
+        
+        // Not matched
+        else {
+            return dp[i][j] = max(solve(i-1, j, text1, text2), solve(i, j-1, text1, text2));
+        }
+    }
+    
+    int longestCommonSubsequence(const string& text1, const string& text2) {
+        int n = text1.size();
+        int m = text2.size();
+        
+       memset(dp, -1, sizeof(dp)); // Memoization initializing with all -1
+        
+        return solve(n, m, text1, text2);
+    }
+};
+
+
+Approach - 2 Tabulation 
+
+#include <vector>
+#include <algorithm>
+
+class Solution {
+public:
+    int longestCommonSubsequence(const string& text1, const string& text2) {
+        int n = text1.size();
+        int m = text2.size();
+        
+        // Initialize a 2D table for tabulation
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+
+        // Fill the table using a bottom-up approach
+        for (int i = 1; i <= n; ++i) {
+            for (int j = 1; j <= m; ++j) {
+                // If the current characters match, extend the LCS
+                if (text1[i-1] == text2[j-1]) {
+                    dp[i][j] = 1 + dp[i-1][j-1];
+                } else {
+                    // If not, take the maximum length from the previous row or column
+                    dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+                }
+            }
+        }
+
+        // The result is stored in the bottom-right cell of the table
+        return dp[n][m];
+    }
+};
+
+
+Approach - 3 Space Optimization with Prev and Prev 2
+
+class Solution {
+public:
+    int longestCommonSubsequence(const string& text1, const string& text2) {
+        int n = text1.size();
+        int m = text2.size();
+        
+        // Initialize a 1D table for tabulation
+        vector<int> prev(m + 1, 0), cur(m + 1, 0);
+
+        // Fill the table using a bottom-up approach
+        for (int i = 1; i <= n; ++i) {
+            for (int j = 1; j <= m; ++j) {
+                // If the current characters match, extend the LCS
+                if (text1[i - 1] == text2[j - 1]) {
+                    cur[j] = 1 + prev[j - 1];
+                } else {
+                    // If not, take the maximum length from the previous row or column
+                    cur[j] = max(prev[j], cur[j - 1]);
+                }
+            }
+            
+            // Copy values from cur to prev without using std::
+            for (int k = 0; k <= m; ++k) {
+                prev[k] = cur[k];
+            }
+        }
+
+        // The result is stored in the bottom-right cell of the table
+        return prev[m];
+    }
+};
+
