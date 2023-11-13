@@ -1,0 +1,115 @@
+Approach - 1 Memoization
+
+class Solution {
+public:
+    
+    int solve(int ind, int buy, vector<int>&prices, int n, vector<vector<int>> &dp) {
+        
+        //base case
+        if (ind == n) return 0; //didnt sell any or reached the end of the prices
+        
+        if (dp[ind][buy] != -1) return dp[ind][buy];
+        
+        int profit = 0;
+        
+        if (buy) { //buying on that index -- taking -ve as we are buying and move to the next index and keep buy as 0 cause we cant buy again until we sell
+            profit = max((-prices[ind] + solve(ind+1, 0, prices, n, dp)), 
+                         (0 + solve(ind+1, 1, prices, n, dp))); //not taking and movinf to next index and keeping buy as 1 as we can consider next ind to buy
+        }
+        
+        else { //sell
+           profit = max(prices[ind] + solve(ind+1, 1, prices, n, dp), //sell and keep buy as 1 cause now we can buy after selling held stock
+                     0 + solve(ind+1, 0, prices, n, dp)); //not sell
+            
+            
+        }
+        
+        return dp[ind][buy] = profit;
+    }
+    
+    
+    int maxProfit(vector<int>& prices) {
+        
+        int n= prices.size();
+        
+        vector<vector<int>> dp(n, vector<int>(2, -1));
+        
+        return solve(0, 1, prices, n, dp);
+        
+    }
+};
+
+Approach - 2 Tabulation
+
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+        
+        // Check for the edge case
+        if (n == 0) {
+            return 0;
+        }
+        
+        // Define dp array with size (n+1) x 2
+        vector<vector<int>> dp(n + 1, vector<int>(2, 0));
+        
+        // Base case - anything which has exhausted the prices == n return 0
+        dp[n][0] = dp[n][1] = 0;
+        
+        for (int ind = n - 1; ind >= 0; ind--) {
+            for (int buy = 0; buy <= 1; buy++) {
+                int profit = 0;
+                
+                if (buy) { // buying on that index
+                    profit = max((-prices[ind] + dp[ind + 1][0]), (0 + dp[ind + 1][1]));
+                } else { // sell
+                    profit = max((prices[ind] + dp[ind + 1][1]), (0 + dp[ind + 1][0]));
+                }
+                
+                dp[ind][buy] = profit;
+            }
+        }
+        
+        return dp[0][1];
+    }
+};
+
+
+Approach - 3 Space Optimization
+
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+        
+        // Check for the edge case
+        if (n == 0) {
+            return 0;
+        }
+        
+        // Define dp array with size (n+1) x 2
+        vector<int> ahead(2,0), cur(2,0);
+        
+        
+        // Base case - anything which has exhausted the prices == n return 0
+        ahead[0] = ahead[1] = 0;
+        
+        for (int ind = n - 1; ind >= 0; ind--) {
+            for (int buy = 0; buy <= 1; buy++) {
+                int profit = 0;
+                
+                if (buy) { // buying on that index
+                    profit = max((-prices[ind]+ahead[0]), (0 + ahead[1]));
+                } else { // sell
+                    profit = max((prices[ind] + ahead[1]), (0 + ahead[0]));
+                }
+                
+                cur[buy] = profit;
+            }
+            ahead = cur;
+        }
+        
+        return ahead[1];
+    }
+};
