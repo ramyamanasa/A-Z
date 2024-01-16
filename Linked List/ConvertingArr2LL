@@ -1,0 +1,57 @@
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+class Node {
+    public:
+    int data; 
+    Node* next;
+    
+    public:
+    //Constructor
+    Node(int data1, Node* next1)
+    { //self defined data type
+        data = data1;
+        next = next1;
+        }
+    
+    //one more constructor to assign nullptr
+    public:
+    Node(int data1) {
+        data = data1;
+        next = nullptr;
+    }
+};
+
+//method to convert Arr into LL
+Node * ConvertArr2LL(vector<int>arr)
+{
+    Node* head = new Node(arr[0]); //Assigning first element to head
+    Node* mover = head; //ptr which will move forward
+    
+    for(int i=1; i<arr.size(); i++)
+    {
+        Node* temp = new Node(arr[i]); // assigning each element to temp 
+        mover->next = temp;
+        mover = temp;
+    }
+    return head;
+}
+int main() {
+    
+    vector<int> arr = {2,5,8,7};
+    
+    Node *head = ConvertArr2LL(arr);
+    
+    //Traversal
+    Node* temp = head;
+    while(temp)
+    {
+        cout << temp->data << " ";
+        temp = temp->next;
+    }
+    
+  
+    
+    return 0;
+}
